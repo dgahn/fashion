@@ -1,15 +1,15 @@
 package me.dgahn.interfaces.dto
 
 import me.dgahn.domain.model.Product
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 
 data class ProductRequestDto(
     val brand: String,
     val category: String,
     val price: Int,
 ) {
-    fun toDomain(): Product =
+    fun toDomain(id: Long = 0): Product =
         Product(
+            id = id,
             brand = brand,
             category = category,
             price = price,
