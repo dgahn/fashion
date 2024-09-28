@@ -1,11 +1,13 @@
 package me.dgahn.interfaces.controller
 
 import me.dgahn.application.service.ProductCreator
+import me.dgahn.application.service.ProductDeleter
 import me.dgahn.application.service.ProductUpdater
 import me.dgahn.interfaces.dto.ProductRequestDto
 import me.dgahn.interfaces.dto.ProductResponseDto
 import me.dgahn.interfaces.dto.toResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 class ProductController(
     private val productCreator: ProductCreator,
     private val productUpdater: ProductUpdater,
+    private val productDeleter: ProductDeleter,
 ) {
     @PostMapping("/api/v1/products")
     fun create(
@@ -32,5 +35,13 @@ class ProductController(
         @RequestBody request: ProductRequestDto,
     ): ResponseEntity<ProductResponseDto> {
         return ResponseEntity.ok(productUpdater.update(request.toDomain(id = id)).toResponse())
+    }
+
+    @DeleteMapping("api/v1/products/{product-id}")
+    fun delete(
+        @PathVariable("product-id") id: Long,
+    ): ResponseEntity<Unit> {
+        productDeleter.delete(id)
+        return ResponseEntity.ok(Unit)
     }
 }

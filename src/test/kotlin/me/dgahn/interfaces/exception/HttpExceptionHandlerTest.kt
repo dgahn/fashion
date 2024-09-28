@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import me.dgahn.application.exception.BadRequestException
 import me.dgahn.application.service.ProductCreator
+import me.dgahn.application.service.ProductDeleter
 import me.dgahn.application.service.ProductUpdater
 import me.dgahn.interfaces.controller.ProductController
 import me.dgahn.interfaces.controller.ProductFixture
@@ -31,6 +32,9 @@ class HttpExceptionHandlerTest : AbstractRestDocControllerTest() {
 
     @MockkBean
     lateinit var productUpdater: ProductUpdater
+
+    @MockkBean
+    lateinit var productDeleter: ProductDeleter
 
     @DisplayName("BadRequestException 예외 테스트")
     @Test

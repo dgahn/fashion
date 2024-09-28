@@ -5,6 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import me.dgahn.application.service.ProductCreator
+import me.dgahn.application.service.ProductDeleter
 import me.dgahn.application.service.ProductUpdater
 import me.dgahn.interfaces.restdoc.AbstractRestDocControllerTest
 import me.dgahn.util.objectMapper
@@ -31,10 +32,14 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
     @MockkBean
     lateinit var productUpdater: ProductUpdater
 
+    @MockkBean
+    lateinit var productDeleter: ProductDeleter
+
     @DisplayName("[POST] api/v1/products")
     @Test
     fun `상품을 등록할 수 있다`() {
         val url = "api/v1/products"
+        val documentId = "post/$url"
 
         every { productCreator.create(any()) } returns ProductFixture.DOMAIN
 
@@ -63,7 +68,7 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                     .isOk(),
             ).andDo(
                 MockMvcRestDocumentation.document(
-                    url,
+                    documentId,
                     Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                     Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     PayloadDocumentation.requestFields(requestFields),
@@ -71,7 +76,7 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                 ),
             ).andDo(
                 MockMvcRestDocumentation.document(
-                    url,
+                    documentId,
                     Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                     Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     ResourceDocumentation.resource(
@@ -95,6 +100,7 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
     @Test
     fun `상품을 업데이트할 수 있다`() {
         val url = "api/v1/products/{product-id}"
+        val documentId = "put/$url"
         val id = 1
 
         every { productUpdater.update(any()) } returns ProductFixture.DOMAIN
@@ -127,7 +133,7 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                     .isOk(),
             ).andDo(
                 MockMvcRestDocumentation.document(
-                    url,
+                    documentId,
                     Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                     Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     RequestDocumentation.pathParameters(pathParams),
@@ -136,17 +142,68 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                 ),
             ).andDo(
                 MockMvcRestDocumentation.document(
-                    url,
+                    documentId,
                     Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                     Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     ResourceDocumentation.resource(
                         ResourceSnippetParametersBuilder()
                             .tag("상품 API")
-                            .summary("상품 등록 API")
-                            .description("상품을 등록합니다.")
+                            .summary("상품 변경 API")
+                            .description("상품을 변경합니다.")
                             .pathParameters(*pathParams.toTypedArray())
                             .requestFields(requestFields)
                             .responseFields(responseFields)
+                            .build(),
+                    ),
+                ),
+            )
+
+        result
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+    }
+
+    @DisplayName("[DELETE] api/v1/products")
+    @Test
+    fun `상품을 삭제할 수 있다`() {
+        val url = "api/v1/products/{product-id}"
+        val documentId = "delete/$url"
+        val id = 1
+
+        every { productDeleter.delete(any()) } returns Unit
+
+        val pathParams = listOf(
+            RequestDocumentation.parameterWithName("product-id").description("상품의 식별자"),
+        )
+
+        val result = mockMvc
+            .perform(
+                RestDocumentationRequestBuilders
+                    .delete("/$url", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8"),
+            ).andExpect(
+                MockMvcResultMatchers
+                    .status()
+                    .isOk(),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    RequestDocumentation.pathParameters(pathParams),
+                ),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    ResourceDocumentation.resource(
+                        ResourceSnippetParametersBuilder()
+                            .tag("상품 API")
+                            .summary("상품 삭제 API")
+                            .description("상품을 삭제합니다.")
+                            .pathParameters(*pathParams.toTypedArray())
                             .build(),
                     ),
                 ),
