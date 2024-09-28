@@ -8,8 +8,8 @@ import org.springframework.boot.runApplication
 @EnableConfigurationProperties
 @ConfigurationPropertiesScan
 @SpringBootApplication
-class Application
+class FashionApplication
 
 fun main() {
-    runApplication<Application>()
+    runApplication<FashionApplication>()
 }

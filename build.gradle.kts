@@ -12,16 +12,14 @@ plugins {
 
     id("com.epages.restdocs-api-spec") version "0.19.2"
     id("org.hidetake.swagger.generator") version "2.19.2"
-    id("org.asciidoctor.jvm.convert") version "4.0.3"
 }
 
 group = "me.dgahn"
 version = "1.0-SNAPSHOT"
 
-val asciidoctorExtensions: Configuration by configurations.creating
-
-val snippetsDir by extra { file("${layout. buildDirectory}/generated-snippets") }
-val restdocsDir by extra { file("${layout. buildDirectory}/resources/main/static/docs") }
+val buildDir = layout.buildDirectory.get()
+val snippetsDir by extra { file("$buildDir/generated-snippets") }
+val restdocsDir by extra { file("$buildDir/resources/main/static/docs") }
 tasks {
     withType<Test> {
         useJUnitPlatform()
@@ -29,74 +27,38 @@ tasks {
             events("PASSED", "FAILED", "SKIPPED")
         }
         outputs.dir(snippetsDir)
-        finalizedBy(asciidoctor)
-        finalizedBy("copyOasToSrcResource")
-        finalizedBy("copyOasToBuildResource")
         dependsOn(formatKotlin)
+        finalizedBy("copyOasToBuildResource")
+        finalizedBy("copyOasToSrcResource")
     }
+
     bootJar {
-        dependsOn(asciidoctor)
         dependsOn("copyOasToBuildResource")
-        from("${asciidoctor.get().outputDir}") {
-            into("static/docs")
-        }
     }
 
     register<Copy>("copyOasToBuildResource") {
         delete("src/main/resources/static/swagger-ui/openapi3.yaml")
-        from("${layout. buildDirectory}/api-spec/openapi3.yaml")
-        into("${layout. buildDirectory}/resources/main/static/swagger-ui/.")
+        from("$buildDir/api-spec/openapi3.yaml")
+        into("$buildDir/resources/main/static/swagger-ui/.")
         dependsOn("openapi3")
     }
 
     register<Copy>("copyOasToSrcResource") {
         delete("src/main/resources/static/swagger-ui/openapi3.yaml")
-        from("${layout. buildDirectory}/api-spec/openapi3.yaml")
+        from("$buildDir/api-spec/openapi3.yaml")
         into("src/main/resources/static/swagger-ui/.")
         dependsOn("openapi3")
     }
 
-    register<Copy>("copyRestDocs") {
-        delete("src/main/resources/static/docs/index.html")
-        from("${layout. buildDirectory}/resources/main/static/docs/index.html")
-        into("src/main/resources/static/docs/.")
-    }
-
-    asciidoctor {
-        configurations(asciidoctorExtensions.name) // 위에서 작성한 configuration 적용
-        inputs.dir(snippetsDir) // snippetsDir 를 입력으로 구성
-        setOutputDir(restdocsDir) // restdocsDir 를 출력으로 구성
-        attributes["project-version"] = project.version
-        attributes["source-highlighter"] = "prettify"
-
-        // source가 없으면 .adoc파일을 전부 html로 만들어버림
-        // source 지정시 특정 adoc만 HTML로 만든다.
-        sources {
-            include("**/index.adoc")
-        }
-
-        attributes(
-            mapOf(
-                "backend" to "html5",
-                "snippets" to file("build/generated-snippets")
-            )
-        )
-
-        finalizedBy("copyRestDocs")
-    }
     named("resolveMainClassName") {
-        mustRunAfter(asciidoctor)
         mustRunAfter(":copyOasToBuildResource")
-    }
-    jar {
-        dependsOn(asciidoctor)
-        dependsOn("copyOasToBuildResource")
     }
 
     java {
         sourceCompatibility = JavaVersion.VERSION_22
         targetCompatibility = JavaVersion.VERSION_22
     }
+
     compileKotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_22)
@@ -111,15 +73,15 @@ tasks {
 
 openapi3 {
     setServer("/")
-    title = "ServerName Documents"
-    description = "ServerName API 문서"
+    title = "패션 Documents"
+    description = "패션 API 문서"
     version = "0.0.1"
     format = "yaml"
     delete {
         file("src/main/resources/static/swagger-ui/openapi3.yaml")
     }
     copy {
-        from("${layout. buildDirectory}/api-spec/openapi3.yaml")
+        from("$buildDir/api-spec/openapi3.yaml")
         into("src/main/resources/static/swagger-ui/.")
     }
 }
