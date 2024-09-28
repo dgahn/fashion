@@ -17,4 +17,8 @@ class OutfitSearcher(
             .mapNotNull { it.value.firstOrNull() }
             .map { it.toDomain() }
     }
+
+    fun getSingleBrandOutfitLowestPrice(): List<Product> {
+        TODO("Not yet implemented")
+    }
 }

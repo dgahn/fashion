@@ -78,4 +78,57 @@ class OutfitControllerTest : AbstractRestDocControllerTest() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(MockMvcResultHandlers.print())
     }
+
+    @DisplayName("[GET] api/v1/outfit/single-brand/lowest-price")
+    @Test
+    fun `단일브랜드별 가장 저렴한 코디 스타일을 조회할 수 있다`() {
+        val url = "api/v1/outfit/single-brand/lowest-price"
+        val documentId = "get/$url"
+
+        every { outfitSearcher.getSingleBrandOutfitLowestPrice() } returns listOf(ProductFixture.DOMAIN)
+
+        val responseFields = listOf(
+            PayloadDocumentation.fieldWithPath("brand").description("상품의 브랜드"),
+            PayloadDocumentation.fieldWithPath("total").description("총 비용"),
+            PayloadDocumentation.fieldWithPath("categories[].category").description("카테고리"),
+            PayloadDocumentation.fieldWithPath("categories[].price").description("상품 가격"),
+        )
+
+        val result = mockMvc
+            .perform(
+                RestDocumentationRequestBuilders
+                    .get("/$url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8"),
+            ).andExpect(
+                MockMvcResultMatchers
+                    .status()
+                    .isOk(),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    PayloadDocumentation.responseFields(responseFields),
+                ),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    ResourceDocumentation.resource(
+                        ResourceSnippetParametersBuilder()
+                            .tag("Outfit API")
+                            .summary("단일 브랜드별 가장 저렴한 코디 스타일 조회 API")
+                            .description("단일 브랜드별로 가장 저렴하게 코디할 수 있는 스타일을 조회합니다.")
+                            .responseFields(responseFields)
+                            .build(),
+                    ),
+                ),
+            )
+
+        result
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+    }
 }
