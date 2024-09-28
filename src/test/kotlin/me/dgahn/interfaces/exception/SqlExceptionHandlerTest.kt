@@ -1,12 +1,13 @@
-package me.dgahn.interfaces.controller
+package me.dgahn.interfaces.exception
 
-import com.epages.restdocs.apispec.ResourceDocumentation
-import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import me.dgahn.application.service.ProductCreator
+import me.dgahn.interfaces.controller.ProductController
+import me.dgahn.interfaces.controller.ProductFixture
 import me.dgahn.interfaces.restdoc.AbstractRestDocControllerTest
 import me.dgahn.util.objectMapper
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
@@ -19,19 +20,20 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@DisplayName("ProductController 테스트")
-@WebMvcTest(ProductController::class)
+@DisplayName("SqlExceptionHandler 테스트")
+@WebMvcTest(SqlExceptionHandler::class, ProductController::class)
 @AutoConfigureRestDocs
-class ProductControllerTest : AbstractRestDocControllerTest() {
+class SqlExceptionHandlerTest : AbstractRestDocControllerTest() {
     @MockkBean
     lateinit var productCreator: ProductCreator
 
-    @DisplayName("[POST] api/v1/products")
+    @DisplayName("JdbcSQLIntegrityConstraintViolationException 예외 테스트")
     @Test
-    fun `상품을 등록할 수 있다`() {
+    fun `JdbcSQL 예외가 발생하면 예외 응답을 낼 수 있다`() {
         val url = "api/v1/products"
 
-        every { productCreator.create(any()) } returns ProductFixture.DOMAIN
+        every { productCreator.create(any()) } throws
+            JdbcSQLIntegrityConstraintViolationException("", "", "", 0, RuntimeException(), "")
 
         val requestFields = listOf(
             PayloadDocumentation.fieldWithPath("brand").description("상품의 브랜드"),
@@ -39,10 +41,9 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
             PayloadDocumentation.fieldWithPath("price").description("상품의 가격"),
         )
         val responseFields = listOf(
-            PayloadDocumentation.fieldWithPath("id").description("상품의 식별자"),
-            PayloadDocumentation.fieldWithPath("brand").description("상품의 브랜드"),
-            PayloadDocumentation.fieldWithPath("category").description("상품의 카테고리"),
-            PayloadDocumentation.fieldWithPath("price").description("상품의 가격"),
+            PayloadDocumentation.fieldWithPath("status").description("http 상태 코드"),
+            PayloadDocumentation.fieldWithPath("message").description("에러 메시지"),
+            PayloadDocumentation.fieldWithPath("timestamp").description("에러가 발생한 시간"),
         )
 
         val result = mockMvc
@@ -55,7 +56,7 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
             ).andExpect(
                 MockMvcResultMatchers
                     .status()
-                    .isOk(),
+                    .isBadRequest(),
             ).andDo(
                 MockMvcRestDocumentation.document(
                     url,
@@ -64,25 +65,10 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                     PayloadDocumentation.requestFields(requestFields),
                     PayloadDocumentation.responseFields(responseFields),
                 ),
-            ).andDo(
-                MockMvcRestDocumentation.document(
-                    url,
-                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                    ResourceDocumentation.resource(
-                        ResourceSnippetParametersBuilder()
-                            .tag("상품 API")
-                            .summary("상품 등록 API")
-                            .description("상품을 등록합니다.")
-                            .requestFields(requestFields)
-                            .responseFields(responseFields)
-                            .build(),
-                    ),
-                ),
             )
 
         result
-            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
             .andDo(MockMvcResultHandlers.print())
     }
 }
