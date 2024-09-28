@@ -1,3 +1,5 @@
 package me.dgahn.application.exception
 
-data class FashionNotFoundException(override val message: String) : RuntimeException(message)
+data class FashionNotFoundException(
+    override val message: String,
+) : BadRequestException(message)
