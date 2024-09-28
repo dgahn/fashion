@@ -19,8 +19,12 @@ abstract class AbstractRestDocControllerTest {
     protected lateinit var mockMvc: MockMvc
 
     @BeforeEach
-    fun init(context: WebApplicationContext, provider: RestDocumentationContextProvider?) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+    fun init(
+        context: WebApplicationContext,
+        provider: RestDocumentationContextProvider?,
+    ) {
+        this.mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
             .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(provider))
             .build()
     }
