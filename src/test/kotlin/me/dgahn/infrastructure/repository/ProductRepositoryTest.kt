@@ -46,4 +46,10 @@ class ProductRepositoryTest {
             it.price shouldBe 1900
         }
     }
+
+    @Test
+    fun `브랜드별 총합을 구할 수 있다`() {
+        val brandTotal = productRepository.getBrandTotal()
+        brandTotal.find { it.brand == "C" }?.totalPrice shouldBe 37100L
+    }
 }

@@ -18,7 +18,15 @@ class OutfitSearcher(
             .map { it.toDomain() }
     }
 
+    @Transactional(readOnly = true)
     fun getSingleBrandOutfitLowestPrice(): List<Product> {
-        TODO("Not yet implemented")
+        return productRepository
+            .findByBrand(findLowestBrand())
+            .map { it.toDomain() }
     }
+
+    private fun findLowestBrand(): String = productRepository
+        .getBrandTotal()
+        .minBy { it.totalPrice }
+        .brand
 }

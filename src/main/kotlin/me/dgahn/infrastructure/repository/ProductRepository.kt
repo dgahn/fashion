@@ -16,4 +16,15 @@ interface ProductRepository : JpaRepository<ProductEntity, Long> {
     """,
     )
     fun cheapestByCategory(): List<ProductEntity>
+
+    @Query(
+        """
+            SELECT new me.dgahn.infrastructure.repository.BrandPriceDto(p.brand, SUM(p.price))
+              FROM ProductEntity p
+          GROUP BY p.brand
+        """,
+    )
+    fun getBrandTotal(): List<BrandPriceDto>
+
+    fun findByBrand(brand: String): List<ProductEntity>
 }
