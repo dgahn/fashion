@@ -1,0 +1,36 @@
+= ServerName-api Documents
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:docinfo: shared-head
+
+== Overview
+
+개요
+
+=== Domain
+
+[cols="1,3"]
+|===
+| Environment | Domain
+
+| 개발 서버 | `https://주소`
+|===
+
+== 요청
+
+=== 요청
+:path: {snippets}/경로
+
+==== Request Sample
+
+include::{path}/http-request.adoc[]
+
+include::{path}/curl-request.adoc[]
+
+==== Response Sample
+
+include::{path}/http-response.adoc[]
