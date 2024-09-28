@@ -107,7 +107,8 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
         val url = "api/v1/products/categories/{category}/price-range"
         val documentId = "post/$url"
 
-        every { productSearchService.searchPriceRange(category) } returns listOf(ProductFixture.DOMAIN)
+        val products = listOf(ProductFixture.DOMAIN)
+        every { productSearchService.searchPriceRange(category) } returns (products to products)
 
         val responseFields = listOf(
             PayloadDocumentation.fieldWithPath("category").description("상품의 카테고리"),

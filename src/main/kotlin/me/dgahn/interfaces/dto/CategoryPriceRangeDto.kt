@@ -8,21 +8,13 @@ data class PriceRangeResponse(
     val max: List<PriceDetail>,
 ) {
     companion object {
-        fun of(category: String, products: List<Product>): PriceRangeResponse {
+        fun of(category: String, products: Pair<List<Product>, List<Product>>): PriceRangeResponse {
             return PriceRangeResponse(
                 category = category,
-                min = minPriceDetail(products),
-                max = maxPriceDetail(products),
+                min = products.first.map { it.toDetail() },
+                max = products.second.map { it.toDetail() },
             )
         }
-
-        private fun minPriceDetail(products: List<Product>) = products
-            .filter { it.price == products.minOf { it.price } }
-            .map { it.toDetail() }
-
-        private fun maxPriceDetail(products: List<Product>) = products
-            .filter { it.price == products.maxOf { it.price } }
-            .map { it.toDetail() }
     }
 }
 

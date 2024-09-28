@@ -1,5 +1,6 @@
 package me.dgahn.infrastructure.repository
 
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,5 +52,19 @@ class ProductRepositoryTest {
     fun `브랜드별 총합을 구할 수 있다`() {
         val brandTotal = productRepository.getBrandTotal()
         brandTotal.find { it.brand == "C" }?.totalPrice shouldBe 37100L
+    }
+
+    @Test
+    fun `카테고리의 최소 가격 상품을 조회할 수 있다`() {
+        val products = productRepository.getMinProductsByCategory("상의")
+        products shouldHaveSize 1
+        products.first().price shouldBe 10000
+    }
+
+    @Test
+    fun `카테고리의 최대 가격 상품을 조회할 수 있다`() {
+        val products = productRepository.getMaxProductsByCategory("상의")
+        products shouldHaveSize 1
+        products.first().price shouldBe 11400
     }
 }
