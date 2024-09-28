@@ -2,9 +2,10 @@ package me.dgahn.interfaces.exception
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import me.dgahn.application.service.ProductCreator
-import me.dgahn.application.service.ProductDeleter
-import me.dgahn.application.service.ProductUpdater
+import me.dgahn.application.service.ProductSearchService
+import me.dgahn.domain.service.ProductCreator
+import me.dgahn.domain.service.ProductDeleter
+import me.dgahn.domain.service.ProductUpdater
 import me.dgahn.interfaces.controller.ProductController
 import me.dgahn.interfaces.controller.ProductFixture
 import me.dgahn.interfaces.restdoc.AbstractRestDocControllerTest
@@ -34,6 +35,9 @@ class SqlExceptionHandlerTest : AbstractRestDocControllerTest() {
 
     @MockkBean
     lateinit var productDeleter: ProductDeleter
+
+    @MockkBean
+    lateinit var productSearchService: ProductSearchService
 
     @DisplayName("JdbcSQLIntegrityConstraintViolationException 예외 테스트")
     @Test

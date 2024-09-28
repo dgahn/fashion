@@ -9,9 +9,9 @@ import me.dgahn.infrastructure.repository.BrandPriceDto
 import me.dgahn.infrastructure.repository.ProductRepository
 import org.junit.jupiter.api.Test
 
-class OutfitSearcherTest {
+class OutfitServiceTest {
     private val productRepository: ProductRepository = mockk()
-    private val outfitSearcher: OutfitSearcher = OutfitSearcher(productRepository)
+    private val outfitService: OutfitService = OutfitService(productRepository)
 
     @Test
     fun `카테고리에 최소가격이 여러개인 경우 카테고리당 하나만 선택된다`() {
@@ -21,7 +21,7 @@ class OutfitSearcherTest {
             ProductEntity(brand = "C", category = "상의", price = 10000),
         )
 
-        outfitSearcher.getLowestOutfit() shouldHaveSize 1
+        outfitService.getLowestOutfit() shouldHaveSize 1
     }
 
     @Test
@@ -40,7 +40,7 @@ class OutfitSearcherTest {
             ProductEntity(brand = "B", category = "양말", price = 2000),
             ProductEntity(brand = "B", category = "액세서리", price = 2200),
         )
-        val actual = outfitSearcher.getSingleBrandOutfitLowestPrice()
+        val actual = outfitService.getSingleBrandOutfitLowestPrice()
         actual shouldHaveSize 8
         actual.first().brand shouldBe "B"
     }

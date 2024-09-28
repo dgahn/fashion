@@ -4,9 +4,10 @@ import com.epages.restdocs.apispec.ResourceDocumentation
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import me.dgahn.application.service.ProductCreator
-import me.dgahn.application.service.ProductDeleter
-import me.dgahn.application.service.ProductUpdater
+import me.dgahn.application.service.ProductSearchService
+import me.dgahn.domain.service.ProductCreator
+import me.dgahn.domain.service.ProductDeleter
+import me.dgahn.domain.service.ProductUpdater
 import me.dgahn.interfaces.restdoc.AbstractRestDocControllerTest
 import me.dgahn.util.objectMapper
 import org.junit.jupiter.api.DisplayName
@@ -34,6 +35,9 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
 
     @MockkBean
     lateinit var productDeleter: ProductDeleter
+
+    @MockkBean
+    lateinit var productSearchService: ProductSearchService
 
     @DisplayName("[POST] api/v1/products")
     @Test
@@ -85,6 +89,61 @@ class ProductControllerTest : AbstractRestDocControllerTest() {
                             .summary("상품 등록 API")
                             .description("상품을 등록합니다.")
                             .requestFields(requestFields)
+                            .responseFields(responseFields)
+                            .build(),
+                    ),
+                ),
+            )
+
+        result
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+    }
+
+    @DisplayName("[GET] api/v1/products/categories/{category}/price-range")
+    @Test
+    fun `카테고리로 상품의 가격 범위 정보를 조회할 수 있다`() {
+        val category = "상의"
+        val url = "api/v1/products/categories/{category}/price-range"
+        val documentId = "post/$url"
+
+        every { productSearchService.searchPriceRange(category) } returns listOf(ProductFixture.DOMAIN)
+
+        val responseFields = listOf(
+            PayloadDocumentation.fieldWithPath("category").description("상품의 카테고리"),
+            PayloadDocumentation.fieldWithPath("min[].brand").description("최소 가격의 상품 브랜드명"),
+            PayloadDocumentation.fieldWithPath("min[].price").description("최소 가격의 상품 가격"),
+            PayloadDocumentation.fieldWithPath("max[].brand").description("최대 가격의 상품 브랜드명"),
+            PayloadDocumentation.fieldWithPath("max[].price").description("최대 가격의 상품 가격"),
+        )
+
+        val result = mockMvc
+            .perform(
+                RestDocumentationRequestBuilders
+                    .get("/$url", category)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8"),
+            ).andExpect(
+                MockMvcResultMatchers
+                    .status()
+                    .isOk(),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    PayloadDocumentation.responseFields(responseFields),
+                ),
+            ).andDo(
+                MockMvcRestDocumentation.document(
+                    documentId,
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                    ResourceDocumentation.resource(
+                        ResourceSnippetParametersBuilder()
+                            .tag("상품 API")
+                            .summary("상품 가격 범위 조회 API")
+                            .description("상품 가격에 대한 범위를 카테고리 정보로 조회합니다.")
                             .responseFields(responseFields)
                             .build(),
                     ),

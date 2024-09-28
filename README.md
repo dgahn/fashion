@@ -51,7 +51,7 @@ GET /api/v1/outfit/single-brand/lowest-price
 ### category로 최저/최고 가격 상품 조회 API
 #### Request Url
 ```
-GET /api/v1/categories/{category-id}/price-range/products
+GET /api/v1/products/categories/{category-id}/price-range
 ```
 #### Request Body
 - 없음

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class OutfitSearcher(
+class OutfitService(
     private val productRepository: ProductRepository,
 ) {
     @Transactional(readOnly = true)

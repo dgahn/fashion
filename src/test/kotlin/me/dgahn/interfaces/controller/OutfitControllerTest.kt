@@ -4,7 +4,7 @@ import com.epages.restdocs.apispec.ResourceDocumentation
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import me.dgahn.application.service.OutfitSearcher
+import me.dgahn.application.service.OutfitService
 import me.dgahn.interfaces.restdoc.AbstractRestDocControllerTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @AutoConfigureRestDocs
 class OutfitControllerTest : AbstractRestDocControllerTest() {
     @MockkBean
-    lateinit var outfitSearcher: OutfitSearcher
+    lateinit var outfitService: OutfitService
 
     @DisplayName("[GET] api/v1/outfit/lowest-price")
     @Test
@@ -31,7 +31,7 @@ class OutfitControllerTest : AbstractRestDocControllerTest() {
         val url = "api/v1/outfit/lowest-price"
         val documentId = "get/$url"
 
-        every { outfitSearcher.getLowestOutfit() } returns listOf(ProductFixture.DOMAIN)
+        every { outfitService.getLowestOutfit() } returns listOf(ProductFixture.DOMAIN)
 
         val responseFields = listOf(
             PayloadDocumentation.fieldWithPath("total").description("코디된 금액의 총합"),
@@ -85,7 +85,7 @@ class OutfitControllerTest : AbstractRestDocControllerTest() {
         val url = "api/v1/outfit/single-brand/lowest-price"
         val documentId = "get/$url"
 
-        every { outfitSearcher.getSingleBrandOutfitLowestPrice() } returns listOf(ProductFixture.DOMAIN)
+        every { outfitService.getSingleBrandOutfitLowestPrice() } returns listOf(ProductFixture.DOMAIN)
 
         val responseFields = listOf(
             PayloadDocumentation.fieldWithPath("brand").description("상품의 브랜드"),
