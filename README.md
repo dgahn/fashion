@@ -23,6 +23,31 @@
   - 문서의 최신화를 위해 코드로 관리하는 것이 좋다고 생각합니다.
   - 클라이언트에 직접 테스트 해볼 수 있는 화면을 쉽게 제공해야한다고 생각합니다.
 
+### 코드 lint
+- klint를 한번 래핑한 kolinter를 사용하고 테스트 코드가 실행될 때마다 formatting이 되도록 설정하였습니다.
+- .editorconfig에 비선호하는 옵션은 끄도록 설정하였습니다.
+
+## 테스트 방법
+### 개발 환경
+- Kotlin 2.0.20, JDK 22
+- SpringBoot 3.3.4
+
+### 실행
+1. Java Version을 JDK 22로 맞춥니다.
+2. 아래 명령을 통해서 빌드를 실행합니다.
+```shell
+$ ./gradlew build
+```
+3. 애플리케이션을 실행합니다.
+```shell
+$ java -jar build/libs/phone-book-1.0-SNAPSHOT.jar
+```
+
+4. swagger-ui에 접속합니다.
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
 ### 패키지 구성
 - DDD를 좋아하는 편이라 제가 배운 DDD에 맞춰 패키지를 구성하였습니다. (개인적으로 헥사고날을 좋아하는 편은 아닙니다.)
 - interfaces : API 인터페이스에 대한 기능을 모아두었습니다.
