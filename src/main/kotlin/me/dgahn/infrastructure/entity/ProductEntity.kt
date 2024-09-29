@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import me.dgahn.domain.model.Product
@@ -13,6 +14,10 @@ import me.dgahn.domain.model.Product
 @Table(
     name = "product",
     uniqueConstraints = [UniqueConstraint(columnNames = ["brand", "category"])],
+    indexes = [
+        Index(name = "idx_brand", columnList = "brand"),
+        Index(name = "idx_category_price", columnList = "category, price"),
+    ],
 )
 class ProductEntity(
     @Id
@@ -25,7 +30,7 @@ class ProductEntity(
     val category: String,
     @Column(name = "price")
     val price: Int,
-) {
+) : BaseEntity() {
     fun toDomain(): Product {
         return Product(
             id = this.id,
